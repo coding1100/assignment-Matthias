@@ -43,6 +43,8 @@ def main() -> None:
     prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
 
     totals: list[float] = []
+    total_tokens: list[int] = []
+    total_llm_calls: list[int] = []
     success = 0
     count = 0
 
@@ -50,7 +52,9 @@ def main() -> None:
         for prompt in prompts:
             result = pipeline.run(prompt)
             totals.append(result.timings["total_ms"])
-            success += int(result["status"] == "success")
+            total_tokens.append(int(result.total_llm_stats.get("total_tokens", 0)))
+            total_llm_calls.append(int(result.total_llm_stats.get("llm_calls", 0)))
+            success += int(result.status == "success")
             count += 1
 
     summary = {
@@ -60,6 +64,8 @@ def main() -> None:
         "avg_ms": round(statistics.fmean(totals), 2) if totals else 0.0,
         "p50_ms": round(percentile(totals, 50), 2),
         "p95_ms": round(percentile(totals, 95), 2),
+        "avg_tokens": round(statistics.fmean(total_tokens), 2) if total_tokens else 0.0,
+        "avg_llm_calls": round(statistics.fmean(total_llm_calls), 2) if total_llm_calls else 0.0,
     }
     print(json.dumps(summary, indent=2))
 
