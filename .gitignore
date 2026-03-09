@@ -139,7 +139,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .envrc
 .venv
 env/
@@ -213,3 +212,5 @@ __marimo__/
 # Skills
 .agents/
 skills-lock.json
+config.bat
+node_modules
